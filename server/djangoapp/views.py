@@ -44,9 +44,18 @@ def registration_request(request):
 # ...
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
+# def get_dealerships(request):
+#     context = {}
+#     if request.method == "GET":
+#         return render(request, 'djangoapp/index.html', context)
+
 def get_dealerships(request):
-    context = {}
     if request.method == "GET":
+        context = {}
+        url = "https://eu-gb.functions.appdomain.cloud/api/v1/web/345d3eb8-d02e-460e-8ad1-0612be8ea1bd/dealership-package/get-dealership"
+        dealerships = get_dealers_from_cf(url)
+        
+        context["dealership_list"] = dealerships
         return render(request, 'djangoapp/index.html', context)
 
 
