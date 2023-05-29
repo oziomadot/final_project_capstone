@@ -1,3 +1,12 @@
+# import requests
+# import json
+# from .models import CarDealer, DealerReview
+# from requests.auth import HTTPBasicAuth
+# from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+# from ibm_watson import NaturalLanguageUnderstandingV1
+# from ibm_watson.natural_language_understanding_v1 import Features,SentimentOptions
+# import time
+
 import requests
 import json
 from .models import CarDealer, DealerReview
@@ -6,6 +15,7 @@ from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_watson.natural_language_understanding_v1 import Features,SentimentOptions
 import time
+ 
  
 def get_request(url, **kwargs):  
     # If argument contain API KEY
@@ -43,25 +53,48 @@ def post_request(url, payload, **kwargs):
     json_data = json.loads(response.text)
     return json_data
 
-def get_dealers_from_cf(url):
+# def get_dealers_from_cf(url):
+#     results = []
+#     json_result = get_request(url)
+#     if json_result:
+#         dealers = json_result["body"]
+#         for dealer in dealers:
+#             dealer_doc = dealer["doc"]
+#             dealer_obj = CarDealer(
+#                 address=dealer_doc["address"],
+#                 city=dealer_doc["city"],
+#                 full_name=dealer_doc["full_name"],
+#                 id=dealer_doc["id"],
+#                 lat=dealer_doc["lat"],
+#                 long=dealer_doc["long"],
+#                 short_name=dealer_doc["short_name"],
+#                 st=dealer_doc["st"],
+#                 zip=dealer_doc["zip"]
+#             )
+#             results.append(dealer_obj)
+#     return results
+
+def get_dealers_from_cf(url, **kwargs):
     results = []
-    json_result = get_request(url)
+    state = kwargs.get("state")
+    if state:
+        json_result = get_request(url, state=state)
+    else:
+        json_result = get_request(url)
     if json_result:
-        dealers = json_result["body"]
+        # Get the row list in JSON as dealers
+        print("63 - RA",json_result)
+        dealers = json_result
+        # For each dealer object
         for dealer in dealers:
+            # Get its content in `doc` object
             dealer_doc = dealer["doc"]
-            dealer_obj = CarDealer(
-                address=dealer_doc["address"],
-                city=dealer_doc["city"],
-                full_name=dealer_doc["full_name"],
-                id=dealer_doc["id"],
-                lat=dealer_doc["lat"],
-                long=dealer_doc["long"],
-                short_name=dealer_doc["short_name"],
-                st=dealer_doc["st"],
-                zip=dealer_doc["zip"]
-            )
+            dealer_obj = CarDealer(address=dealer_doc["address"], city=dealer_doc["city"],
+                                   id=dealer_doc["id"], lat=dealer_doc["lat"], long=dealer_doc["long"], full_name=dealer_doc["full_name"],
+                                
+                                   st=dealer_doc["st"], zip=dealer_doc["zip"])
             results.append(dealer_obj)
+
     return results
 
 def get_dealer_by_id_from_cf(url, id):
